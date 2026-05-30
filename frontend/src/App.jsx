@@ -1,12 +1,13 @@
 import React from 'react'
 import MovieCard from './components/MovieCard'
+import Home from './pages/Home'
 
 
 const App = () => {
   return (
-    <div>
-      <MovieCard movie={{ title: "Inception", release_date: "2010-07-16", url: "https://example.com/inception.jpg" }} />
-    </div>
+    <>
+    <Home />
+    </>
     
   )
 }
