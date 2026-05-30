@@ -1,39 +1,74 @@
 import MovieCard from "../components/MovieCard";
-import {useState} from "react";
+import { useState, useEffect } from "react";
+import { searchMovies, getPopularMovies } from "../services/api";
+import "../css/Home.css";
 
-function Home(){
-    const [searchQuery, setSearchQuery] = useState("");   
+function Home() {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [movies, setMovies] = useState([]);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-     const movies = [
-        {id : 1, title: "Inception", release_date: "2010-07-16", url: "https://example.com/inception.jpg" },
-        {id : 2, title: "The Matrix", release_date: "1999-03-31", url: "https://example.com/matrix.jpg" },
-        {id : 3, title: "Interstellar", release_date: "2014-11-07", url: "https://example.com/interstellar.jpg" },
-     ];
-     const handleSearch = (e) => {
+    useEffect(() => {
+        const loadPopularMovies = async () => {
+            try {
+                const popularMovies = await getPopularMovies();
+                setMovies(popularMovies);
+            } catch (error) {
+                setError("Failed to Load Movies. Please Try Again Later.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadPopularMovies();
+    }, []);
+
+    const handleSearch = async (e) => {
         e.preventDefault();
-        alert(`Searching for: ${searchQuery}`);
-        setSearchQuery("");
-     }
+        if (!searchQuery.trim()) return;
+        // trim() is used to remove whitespace from both ends of the string.
+        if(loading) return;
+        setLoading(true);
+      //setLoading(true) is used to set the loading state to true when the search is initiated.
+        try {
+            const searchResults = await searchMovies(searchQuery);
+            setMovies(searchResults);
+            setError(null);
+        } catch (error) {
+            console.log(error);
+            setError("Failed to search movies. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    return <div className="home">
-        <form onSubmit={handleSearch} className="search-form">
-            <input 
-                type="text" 
-                placeholder="Search for movies..." 
-                className="search-input" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button type="submit">Search</button>
-        </form> 
-       <div className="movies-grid">
-            {movies.map(movie => (
-            <MovieCard key={movie.id} movie={movie} />
-         )
-        )}
+    return (
+        <div className="home">
+            <form onSubmit={handleSearch} className="search-form">
+                <input
+                    type="text"
+                    placeholder="Search for movies..."
+                    className="search-input"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <button type="submit">Search</button>
+            </form>
 
+            {error && <div className="error-message">{error}</div>}
+
+            {loading ? (
+                <div className="loading">Loading...</div>
+            ) : (
+                <div className="movies-grid">
+                    {movies.map(movie => (
+                        <MovieCard key={movie.id} movie={movie} />
+                    ))}
+                </div>
+            )}
         </div>
-    </div>
-    
+    );
 }
+
 export default Home;
