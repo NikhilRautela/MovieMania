@@ -1,11 +1,14 @@
-import "../css/MovieCard.css"
-import { useMovieContext } from "../contexts/MovieContext"
+import "../css/MovieCard.css";
+import { useMovieContext } from "../contexts/MovieContext";
+import { useNavigate } from "react-router-dom";
 
 function MovieCard({ movie }) {
   const { addToFavorites, removeFromFavorites, isFavorite } = useMovieContext();
   const favorite = isFavorite(movie.id);
+  const navigate = useNavigate();
 
-  function onFavouriteClick() {
+  function onFavouriteClick(e) {
+    e.stopPropagation();
     if (favorite) {
       removeFromFavorites(movie.id);
     } else {
@@ -18,7 +21,7 @@ function MovieCard({ movie }) {
     : "https://via.placeholder.com/500x750?text=No+Image";
 
   return (
-    <div className="movie-card">
+    <div className="movie-card" onClick={() => navigate(`/movie/${movie.id}`)}>
       <div className="movie-poster">
         <img src={posterUrl} alt={movie.title} />
         <div className="movie-overlay">
