@@ -1,40 +1,92 @@
 .favorites {
-  padding: 2rem;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #111;
+  min-height: 100vh;
+}
+
+/* Hero */
+.favorites-hero {
+  text-align: center;
+  padding: 2.5rem 1rem 1.5rem;
+  background: linear-gradient(to bottom, #1a1a2e, #111);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 1rem;
+}
+
+.favorites-hero h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 0.4rem;
+}
+
+.favorites-hero p {
+  color: #aaa;
+  font-size: 1rem;
+}
+
+/* Movies grid — reuses Home grid style */
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
   width: 100%;
   box-sizing: border-box;
 }
 
-.favorites h2 {
-  margin-bottom: 2rem;
+/* Empty State */
+.favorites-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  font-size: 2.5rem;
-  color: #ffffff;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  padding: 5rem 2rem;
+  min-height: 70vh;
+  background-color: #111;
 }
 
-.favorites-empty {
-  text-align: center;
-  padding: 4rem 2rem;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  margin: 2rem auto;
-  max-width: 600px;
+.empty-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+  animation: pulse 2s infinite;
 }
 
 .favorites-empty h2 {
-  margin-bottom: 1rem;
   font-size: 2rem;
-  color: #e50914;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 1rem;
 }
 
 .favorites-empty p {
   color: #999;
-  font-size: 1.2rem;
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.7;
+  max-width: 400px;
 }
 
+.browse-btn {
+  margin-top: 2rem;
+  padding: 0.85rem 2rem;
+  background: linear-gradient(to right, #e50914, #c40812);
+  color: white;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
 
-/* Animation for new favorites being added */
+.browse-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+}
+
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -46,6 +98,32 @@
   }
 }
 
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
 .movies-grid > * {
   animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .favorites-hero h2 {
+    font-size: 1.6rem;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .favorites-empty {
+    padding: 3rem 1.5rem;
+  }
+
+  .empty-icon {
+    font-size: 3.5rem;
+  }
 }

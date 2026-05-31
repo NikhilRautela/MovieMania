@@ -9,6 +9,7 @@ function Home() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Load popular movies on first render
     useEffect(() => {
         const loadPopularMovies = async () => {
             try {
@@ -24,48 +25,79 @@ function Home() {
         loadPopularMovies();
     }, []);
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        if (!searchQuery.trim()) return;
-        // trim() is used to remove whitespace from both ends of the string.
-        if(loading) return;
-        setLoading(true);
-      //setLoading(true) is used to set the loading state to true when the search is initiated.
-        try {
-            const searchResults = await searchMovies(searchQuery);
-            setMovies(searchResults);
-            setError(null);
-        } catch (error) {
-            console.log(error);
-            setError("Failed to search movies. Please try again.");
-        } finally {
-            setLoading(false);
+    // Search as you type with debounce
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            // If search is cleared, go back to popular movies
+            const loadPopularMovies = async () => {
+                setLoading(true);
+                try {
+                    const popularMovies = await getPopularMovies();
+                    setMovies(popularMovies);
+                    setError(null);
+                } catch (error) {
+                    setError("Failed to Load Movies. Please Try Again Later.");
+                } finally {
+                    setLoading(false);
+                }
+            };
+            loadPopularMovies();
+            return;
         }
-    };
+
+        // Debounce — wait 500ms after user stops typing before searching
+        const delay = setTimeout(async () => {
+            setLoading(true);
+            try {
+                const results = await searchMovies(searchQuery);
+                setMovies(results);
+                setError(null);
+            } catch (error) {
+                setError("Failed to search movies. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        }, 500);
+
+        // Cleanup — cancels the previous timeout if user keeps typing
+        return () => clearTimeout(delay);
+
+    }, [searchQuery]); // runs every time searchQuery changes
 
     return (
         <div className="home">
-            <form onSubmit={handleSearch} className="search-form">
-                <input
-                    type="text"
-                    placeholder="Search for movies..."
-                    className="search-input"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button type="submit">Search</button>
-            </form>
+            <div className="home-hero">
+                <h1>Welcome to <span>Movie Mania</span></h1>
+                <p>Discover the most popular movies and save your favorites</p>
+                <div className="search-form">
+                    <input
+                        type="text"
+                        placeholder="Search for movies..."
+                        className="search-input"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+            </div>
 
             {error && <div className="error-message">{error}</div>}
 
             {loading ? (
-                <div className="loading">Loading...</div>
-            ) : (
-                <div className="movies-grid">
-                    {movies.map(movie => (
-                        <MovieCard key={movie.id} movie={movie} />
-                    ))}
+                <div className="loading">
+                    <div className="spinner"></div>
+                    <p>Loading movies...</p>
                 </div>
+            ) : (
+                <>
+                    <h2 className="section-title">
+                        {searchQuery ? `Results for "${searchQuery}"` : "🔥 Popular Movies"}
+                    </h2>
+                    <div className="movies-grid">
+                        {movies.map(movie => (
+                            <MovieCard key={movie.id} movie={movie} />
+                        ))}
+                    </div>
+                </>
             )}
         </div>
     );
